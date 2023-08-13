@@ -1,1 +1,1 @@
-from .ClassifyGPT import ClassifyGPT
+from .classify import ClassifyGPT
