@@ -19,29 +19,58 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import confusion_matrix
+from sklearn import metrics
 
 #The package that determines whether text is written by chatgpt or not 
 #Uses T-SNEs to visualize word embeddings 
-class ClassifyGPT():
+class ClassifyGPT(object):
     
     def __init__(self, entire_df):
         self.orig_data = entire_df
         self.final_table = self.clean_data()
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.final_table["text"], self.final_table["label"], test_size=0.3)
-        self.model_lg = LogisticRegression(penalty='l1',solver='liblinear')
-        
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.final_table["text"], self.final_table["label"],    test_size=0.3)
+        self.model_lg = RandomForestClassifier(max_depth = 50)
+        self.vectorizer = TfidfVectorizer()
+        #rf = RandomForestClassifier(max_depth = 50)
 
     """
     Logistic Regression for now, if theres time add more models
     """
-    def fit(self, train_split = 0.7):
-        pass
+    def train_tfidf(self):
+        #vectorizer = TfidfVectorizer()
+        X_train_tfidf = self.vectorizer.fit_transform(self.X_train)
+        X_test_tfidf = self.vectorizer.transform(self.X_test)
+        self.model_lg.fit(X_train_tfidf, self.y_train)
+        pr = self.model_lg.predict(X_test_tfidf)
+        acc_score = metrics.accuracy_score(self.y_test,pr)
+        
+        # Compute the confusion matrix
+        cm = confusion_matrix(self.y_test, pr)
+        print("Confusion Matrix:\n", cm)
+        return acc_score
 
+    
+    def predict_sentence(self, sentence):
+        df = pd.DataFrame(columns=['text'])
+        df.loc[0] = sentence
+        meow = self.clean_prediction(df)
+        vectored_text = self.vectorizer.transform(meow)
+        prediction = self.model_lg.predict(vectored_text)
+        pred_val = prediction.item()
+        if(pred_val == 0):
+            return "I think this was written by a human!"
+        return "I think this was written by ChatGPT!"
+        
+        
     def remove_stop_words(self,sentence):
         stop_words = set(stopwords.words('english'))
         words = sentence.split() 
         filtered_sentence = [word for word in words if word.lower() not in stop_words]
         return ' '.join(filtered_sentence)
+    
+    def clean_prediction(self, df_prediction):
+        return df_prediction['text'].apply(self.remove_stop_words)
     
     "Removes stop words and joins the data in a more formattable process"
     def clean_data(self):
