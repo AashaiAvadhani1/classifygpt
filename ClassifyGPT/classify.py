@@ -24,14 +24,18 @@ from sklearn.ensemble import GradientBoostingClassifier
 #Uses T-SNEs to visualize word embeddings 
 class ClassifyGPT():
     
-    def __init__(self, entire_df, train_split):
+    def __init__(self, entire_df):
         self.orig_data = entire_df
         self.final_table = self.clean_data()
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(entire_df["text"], entire_df["label"], test_size=0.3)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.final_table["text"], self.final_table["label"], test_size=0.3)
         self.model_lg = LogisticRegression(penalty='l1',solver='liblinear')
+        
 
+    """
+    Logistic Regression for now, if theres time add more models
+    """
+    def fit(self, train_split = 0.7):
         pass
-
 
     def remove_stop_words(self,sentence):
         stop_words = set(stopwords.words('english'))
@@ -109,8 +113,6 @@ class ClassifyGPT():
         plt.show()
     
 
-    def fit(self):
-        pass
 
 
     def word_embedding_fit():
