@@ -16,7 +16,11 @@ setup(
           'scikit-learn',
           'numpy',
           'pandas',
-          'matplotlib'
+          'matplotlib',
+          'torch',
+          'collections'
+          'nltk',
+          'gensim'
       ],
   classifiers=[
         "Programming Language :: Python :: 3",
