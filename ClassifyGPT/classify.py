@@ -33,7 +33,7 @@ class ClassifyGPT(object):
         self.orig_data = entire_df
         self.final_table = self.clean_data()
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.final_table["text"], self.final_table["label"],    test_size=0.3)
-        self.model_lg = RandomForestClassifier(max_depth = 10)
+        self.model_lg = RandomForestClassifier(max_depth = 30)
         self.vectorizer = TfidfVectorizer()
         #rf = RandomForestClassifier(max_depth = 50)
 

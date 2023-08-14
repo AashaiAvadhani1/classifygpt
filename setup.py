@@ -20,7 +20,8 @@ setup(
           'torch',
           'collections'
           'nltk',
-          'gensim'
+          'gensim',
+          'transformers'
       ],
   classifiers=[
         "Programming Language :: Python :: 3",
