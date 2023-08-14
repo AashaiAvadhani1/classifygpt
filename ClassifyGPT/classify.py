@@ -21,7 +21,10 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn import metrics
-
+from transformers import BertTokenizer, BertModel
+from nltk.tokenize import word_tokenize
+from collections import Counter
+import torch
 #The package that determines whether text is written by chatgpt or not 
 #Uses T-SNEs to visualize word embeddings 
 class ClassifyGPT(object):
@@ -30,7 +33,7 @@ class ClassifyGPT(object):
         self.orig_data = entire_df
         self.final_table = self.clean_data()
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.final_table["text"], self.final_table["label"],    test_size=0.3)
-        self.model_lg = RandomForestClassifier(max_depth = 50)
+        self.model_lg = RandomForestClassifier(max_depth = 10)
         self.vectorizer = TfidfVectorizer()
         #rf = RandomForestClassifier(max_depth = 50)
 
@@ -93,20 +96,20 @@ class ClassifyGPT(object):
         result.drop(columns = ["chat_gpt_written", "chatgpt_answers", "human_written", "human_answers"])
 
         return result
-
-    def visualize_top_words_embeddings(X_train, tokenizer, model, num_words=100):
+    
+    
+    def visualize_top_words_embeddings(self, tokenizer=BertTokenizer.from_pretrained('bert-base-uncased'), model=BertModel.from_pretrained('bert-base-uncased'), num_words=100):
         """
-        Visualizes the embeddings of the top words in X_train using t-SNE.
+        Visualizes the embeddings of the top words in self.X_train using t-SNE.
         
         Parameters:
-        - X_train: A list of sentences.
         - tokenizer: A tokenizer compatible with the model.
         - model: The BERT model to generate embeddings.
         - num_words: Number of top words to visualize. Default is 100.
         """
         
         # Tokenization and word frequency calculation
-        all_words = [word_tokenize(sentence) for sentence in X_train]
+        all_words = [word_tokenize(sentence) for sentence in self.X_train]
         all_words = [word for sublist in all_words for word in sublist]
         word_freq = Counter(all_words)
         top_words = [word for word, freq in word_freq.most_common(num_words)]
@@ -140,6 +143,7 @@ class ClassifyGPT(object):
             plt.annotate(word, (x[i], y[i]), fontsize=8, alpha=0.7)
 
         plt.show()
+
     
 
 
